@@ -3,3 +3,5 @@ tmp
 data
 model
 references
+__pycache__
+.vscode
