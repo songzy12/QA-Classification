@@ -69,11 +69,8 @@ def train():
     confusion = {}
     for i, q in enumerate(docs_test):
         if y_predicted[i] != y_test[i]:
-            try:
-                confusion[q.decode('utf8')] = {
-                    'label': id2category[y_test[i]], 'prediction': id2category[y_predicted[i]]}
-            except:
-                continue
+            confusion[q.decode('utf8')] = {
+                'label': id2category[y_test[i]], 'prediction': id2category[y_predicted[i]]}
     with io.open('confusion.json', 'w', encoding='utf8') as f:
         f.write(json.dumps(confusion, ensure_ascii=False, indent=4))
 
