@@ -1,1 +1,5 @@
 *.swp
+tmp
+data
+model
+references
