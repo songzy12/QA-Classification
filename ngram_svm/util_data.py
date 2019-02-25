@@ -43,21 +43,31 @@ def generate_dataset(path_input='label/train_test.json', path_output='svm_train_
 
 
 if __name__ == '__main__':
-    label_files = ['label_course.json',
+    train_files = ['label_course.json',
                    'label_common.json',
-                   'label_2017-03-09_2017-04-14.json',
-                   'label_2017-04-14_2017-05-10.json',
-                   'label_2017-05-10_2017-06-09.json',
-                   'label_2017-06-05_2017-07-02.json',
-                   'label_2017-07-03_2017-08-06.json',
-                   'label_2017-08-07_2017-09-03.json',
-                   'label_2017-09-04_2017-10-01.json',
-                   'label_2017-10-02_2017-11-05.json',
-                   'label_2017-11-06_2017-12-03.json',
-                   'label_2017-12-04_2017-12-31.json',
+                   'label_2017-07.json',
+                   'label_2017-08.json',
+                   'label_2017-09.json',
+                   'label_2017-10.json',
+                   'label_2017-11.json',
+                   'label_2017-12.json',
+                   'label_2018-01.json',
+                   'label_2018-02.json',
+                   'label_2018-03.json',
+                   'label_2018-04.json',
+                   'label_2018-05.json',
+                   'label_2018-06.json',
+                   'label_2018-07.json',
+                   'label_2018-08.json',
+                   'label_2018-09.json',
+                   'label_2018-10.json',
+                   'label_2018-11.json',
+                   'label_2018-12.json',
                    ]
 
-    for label_file in label_files:
+    test_files = ['label_2019-01.json', 'label_2019-02.json']
+
+    for label_file in train_files:
         print(label_file)
         with io.open("../data/label/%s" % label_file, encoding='utf8') as f:
             content = json.loads(f.read())
@@ -68,9 +78,9 @@ if __name__ == '__main__':
                 print(k, len(v))
 
     merge_label_file(
-        path_input=label_files[:-1], path_output='../data/svm/train.json')
+        path_input=train_files, path_output='../data/svm/train.json')
     merge_label_file(
-        path_input=label_files[-1:], path_output='../data/svm/test.json')
+        path_input=test_files, path_output='../data/svm/test.json')
 
     generate_dataset('../data/svm/train.json', '../data/svm/train')
     generate_dataset('../data/svm/test.json', '../data/svm/test')
