@@ -12,9 +12,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, Tf
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.linear_model import SGDClassifier
-from sklearn.grid_search import GridSearchCV
 from sklearn.datasets import load_files
-from sklearn.cross_validation import train_test_split
 from sklearn import metrics
 from sklearn.externals import joblib
 
@@ -49,7 +47,7 @@ def load_model(filename='../model/xgb.pkl'):
 def train():
     # the training data folder must be passed as first argument
     dataset_train = load_files('../data/svm/train', shuffle=False)
-    dataset_test = load_files('../data/svm/train', shuffle=False)
+    dataset_test = load_files('../data/svm/test', shuffle=False)
     print("n_samples: %d" % len(dataset_train.data))
 
     docs_train, docs_test = dataset_train.data, dataset_test.data
@@ -61,7 +59,7 @@ def train():
                          ('tfidf', TfidfTransformer(use_idf=False, norm='l1')),
                          ('clf', XGBClassifier(learning_rate=0.1,
                                                n_estimators=100,
-                                               max_depth=80,
+                                               max_depth=16,
                                                min_child_weight=1,
                                                gamma=0,
                                                subsample=0.8,
@@ -71,15 +69,6 @@ def train():
                                                scale_pos_weight=1,
                                                seed=27))
                          ])
-
-    parameters = {
-        'clf__subsample': (1,)
-        # 'clf__subsample':[i/10.0 for i in range(6,10)],
-        # 'clf__colsample_bytree':[i/10.0 for i in range(6,10)]
-    }
-
-    grid_search = GridSearchCV(text_clf, parameters, n_jobs=-1, cv=10)
-    grid_search.fit(docs_train, y_train)
 
     text_clf.fit(docs_train, y_train)
 

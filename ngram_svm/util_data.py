@@ -67,6 +67,10 @@ if __name__ == '__main__':
 
     test_files = ['label_2019-01.json', 'label_2019-02.json']
 
+    merge_label_file(
+        path_input=test_files + train_files, path_output='../data/svm/train_test.json')
+    generate_dataset('../data/svm/train_test.json', '../data/svm/train_test')
+
     for label_file in train_files:
         print(label_file)
         with io.open("../data/label/%s" % label_file, encoding='utf8') as f:
