@@ -6,28 +6,27 @@ Build a simple Question Classifier using TF-IDF or Bag of Words Model
 """
 
 import sys
+import json
+import io
+import os
 
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.linear_model import SGDClassifier
+import numpy
+
 from sklearn.datasets import load_files
 from sklearn import metrics
 from sklearn.externals import joblib
+from sklearn.pipeline import Pipeline, FeatureUnion
+
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
+from sklearn.feature_extraction import DictVectorizer
 
 from xgboost.sklearn import XGBClassifier
 
 import jieba
 import jieba.posseg as pseg
 import gensim
-import numpy
 
-import json
-import io
-import os
-
-from collections import defaultdict
+from constant import id2category
 
 
 def tokenize(text):
@@ -55,19 +54,14 @@ def train():
 
     # split the dataset in training and test set:
 
-    text_clf = Pipeline([('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1, 4))),
-                         ('tfidf', TfidfTransformer(use_idf=False, norm='l1')),
-                         ('clf', XGBClassifier(learning_rate=0.1,
-                                               n_estimators=100,
-                                               max_depth=16,
-                                               min_child_weight=1,
-                                               gamma=0,
-                                               subsample=0.8,
-                                               colsample_bytree=0.8,
-                                               objective='multi:softprob',
-                                               nthread=4,
-                                               scale_pos_weight=1,
-                                               seed=27))
+    model = XGBClassifier(max_depth=8,
+                          objective='multi:softprob',
+                          n_jobs=4)
+
+    print(model)
+    text_clf = Pipeline([('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1, 3))),
+                         ('tfidf', TfidfTransformer()),
+                         ('clf', model)
                          ])
 
     text_clf.fit(docs_train, y_train)
