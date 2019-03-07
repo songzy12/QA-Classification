@@ -21,6 +21,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, Tf
 from sklearn.feature_extraction import DictVectorizer
 
 from xgboost.sklearn import XGBClassifier
+from xgboost import plot_importance
+from matplotlib import pyplot
 
 import jieba
 import jieba.posseg as pseg
@@ -77,6 +79,11 @@ def train():
     print(cm)
 
     save_model(text_clf)
+
+    print(model.feature_importances_)
+
+    # plot_importance(model)
+    # pyplot.show()
 
 
 def predict(clf, question):
