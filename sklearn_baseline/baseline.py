@@ -25,7 +25,7 @@ from sklearn.svm import LinearSVC
 
 from sklearn.linear_model import SGDClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -62,13 +62,13 @@ def train(data_train='../data/svm/train', data_test='../data/svm/test'):
     y_train, y_test = dataset_train.target, dataset_test.target
 
     # split the dataset in training and test set:
-    models = [SVC(probability=True),
+    models = [SVC(probability=True, gamma='scale'),
               SGDClassifier(),
               KNeighborsClassifier(),
               LogisticRegression(),
-              GaussianNB(),
               DecisionTreeClassifier(),
-              RandomForestClassifier()
+              RandomForestClassifier(),
+              MultinomialNB(),
               ]
 
     for model in models:
