@@ -30,6 +30,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
+from xgboost.sklearn import XGBClassifier
+from xgboost import plot_importance
+
 import jieba
 import jieba.posseg as pseg
 import gensim
@@ -69,11 +72,12 @@ def train(data_train='../data/svm/train', data_test='../data/svm/test'):
               DecisionTreeClassifier(),
               RandomForestClassifier(),
               MultinomialNB(),
+              XGBClassifier(objective='multi:softprob'),
               ]
 
     for model in models:
         print(model)
-        
+
         text_clf = Pipeline([('vect', CountVectorizer(tokenizer=_tokenize, ngram_range=(1, 3))),
                              ('tfidf', TfidfTransformer()),
                              ('clf', model)])

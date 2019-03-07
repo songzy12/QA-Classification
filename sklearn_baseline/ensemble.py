@@ -20,9 +20,9 @@ from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
 from sklearn.feature_extraction import DictVectorizer
 
-from xgboost.sklearn import XGBClassifier
-from xgboost import plot_importance
 from matplotlib import pyplot
+
+import lightgbm as lgb
 
 import jieba
 import jieba.posseg as pseg
@@ -32,8 +32,8 @@ from constant import id2category
 
 
 def tokenize(text):
+    # return jieba.lcut(text)
     return list(text)
-    # return jieba.lcut(text, cut_all=False)
 
 
 def save_model(grid, filename='../model/xgb.pkl'):
@@ -56,9 +56,7 @@ def train():
 
     # split the dataset in training and test set:
 
-    model = XGBClassifier(max_depth=8,
-                          objective='multi:softprob',
-                          n_jobs=4)
+    model = lgb.LGBMClassifier()
 
     print(model)
     text_clf = Pipeline([('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1, 3))),
