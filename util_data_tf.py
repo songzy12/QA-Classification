@@ -165,7 +165,7 @@ test_mode = False
 label_size = len(label2index)
 cache_path_h5py = base_path+'data.h5'
 cache_path_pickle = base_path+'vocab_label.pik'
-max_sentence_length = 200
+max_sentence_length = 40 
 
 # step 1: get (X,y)
 train_X, train_Y = get_X_Y(train_data_x, train_data_y,
