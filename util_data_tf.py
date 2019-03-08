@@ -78,7 +78,7 @@ label_target_object = open(base_path+'label_set.txt', 'w')
 for i, label_freq in enumerate(label_list):
     label, freq = label_freq
     label2index[label] = i
-    label_target_object.write(label+"\n")
+    label_target_object.write(str(label)+"\n")
     if i < 20:
         print(label, freq)
 label_target_object.close()
@@ -134,7 +134,7 @@ def get_X_Y(train_data_x, train_data_y, label_size, test_mode=False):
 
     for index, topic_ids in enumerate(train_data_y_tiny_test):
         topic_id_list = [topic_ids]
-        label_list_dense = [label2index[l] for l in topic_id_list if l.strip()]
+        label_list_dense = [label2index[l] for l in topic_id_list]
         label_list_sparse = transform_multilabel_as_multihot(
             label_list_dense, label_size)
         Y.append(label_list_sparse)
