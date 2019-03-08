@@ -14,7 +14,7 @@ def merge_label_file(path_input, path_output):
         pass
 
     for file_ in path_input:
-        with io.open("../data/label/%s" % file_, encoding='utf8') as f:
+        with io.open("./data/label/%s" % file_, encoding='utf8') as f:
             m.update(json.loads(f.read()))
 
     print(path_output, len(m))
@@ -22,7 +22,7 @@ def merge_label_file(path_input, path_output):
         f.write(json.dumps(m, ensure_ascii=False, indent=4))
 
 
-def generate_dataset(path_input='label/train_test.json', path_output='svm_train_test'):
+def generate_dataset_sklearn(path_input='label/train_test.json', path_output='svm_train_test'):
     with io.open(path_input, encoding='utf8') as f:
         m = json.loads(f.read())
         m_ = defaultdict(list)
@@ -42,7 +42,7 @@ def generate_dataset(path_input='label/train_test.json', path_output='svm_train_
                     f.write(v)
 
 
-if __name__ == '__main__':
+def prepare_sklearn():
     train_files = ['label_course.json',
                    'label_common.json',
                    'label_2017-07.json',
@@ -68,12 +68,13 @@ if __name__ == '__main__':
     test_files = ['label_2019-01.json', 'label_2019-02.json']
 
     merge_label_file(
-        path_input=test_files + train_files, path_output='../data/svm/train_test.json')
-    generate_dataset('../data/svm/train_test.json', '../data/svm/train_test')
+        path_input=test_files + train_files, path_output='./data/svm/train_test.json')
+    generate_dataset_sklearn(
+        './data/svm/train_test.json', './data/svm/train_test')
 
     for label_file in train_files:
         print(label_file)
-        with io.open("../data/label/%s" % label_file, encoding='utf8') as f:
+        with io.open("./data/label/%s" % label_file, encoding='utf8') as f:
             content = json.loads(f.read())
             m = defaultdict(list)
             for k, v in content.items():
@@ -82,9 +83,13 @@ if __name__ == '__main__':
                 print(k, len(v))
 
     merge_label_file(
-        path_input=train_files, path_output='../data/svm/train.json')
+        path_input=train_files, path_output='./data/svm/train.json')
     merge_label_file(
-        path_input=test_files, path_output='../data/svm/test.json')
+        path_input=test_files, path_output='./data/svm/test.json')
 
-    generate_dataset('../data/svm/train.json', '../data/svm/train')
-    generate_dataset('../data/svm/test.json', '../data/svm/test')
+    generate_dataset_sklearn('./data/svm/train.json', './data/svm/train')
+    generate_dataset_sklearn('./data/svm/test.json', './data/svm/test')
+
+
+if __name__ == '__main__':
+    prepare_sklearn()
