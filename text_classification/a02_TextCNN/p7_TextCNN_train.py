@@ -149,7 +149,7 @@ def do_eval(sess,textCNN,evalX,evalY,num_classes):
         #f1_score,p,r=compute_f1_score(list(label_list_top5), evalY[start:end][0])
         label_dict_confuse_matrix=compute_confuse_matrix(target_y, predict_y, label_dict_confuse_matrix)
         eval_loss,eval_counter=eval_loss+curr_eval_loss,eval_counter+1
-        
+
         y_test.append(target_y[0])
         y_predicted.append(predict_y[0])
 
