@@ -39,7 +39,7 @@ tf.app.flags.DEFINE_boolean("use_embedding",False,"whether to use embedding or n
 tf.app.flags.DEFINE_integer("num_filters", 128, "number of filters") #256--->512
 tf.app.flags.DEFINE_string("word2vec_model_path","word2vec-title-desc.bin","word2vec's vocabulary and vectors")
 tf.app.flags.DEFINE_string("name_scope","cnn","name scope value.")
-tf.app.flags.DEFINE_boolean("multi_label_flag",False,"use multi label or single label.")
+tf.app.flags.DEFINE_boolean("multi_label_flag",True,"use multi label or single label.")
 filter_sizes=[6,7,8]
 
 #1.load data(X:list of lint,y:int). 2.create session. 3.feed data. 4.training (5.validation) ,(6.prediction)
