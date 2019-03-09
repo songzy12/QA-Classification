@@ -34,8 +34,8 @@ class TextRNN:
         self.instantiate_weights()
         self.logits = self.inference() #[None, self.label_size]. main computation graph is here.
         if not is_training:
-            return
-        self.loss_val = self.loss() #-->self.loss_nce()
+            return        
+        self.loss_val = self.loss_multilabel()
         self.train_op = self.train()
         self.predictions = tf.argmax(self.logits, axis=1, name="predictions")  # shape:[None,]
         correct_prediction = tf.equal(tf.cast(self.predictions,tf.int32), self.input_y) #tf.argmax(self.logits, 1)-->[batch_size]
@@ -72,6 +72,21 @@ class TextRNN:
         with tf.name_scope("output"): #inputs: A `Tensor` of shape `[batch_size, dim]`.  The forward activations of the input network.
             logits = tf.matmul(self.output_rnn_last, self.W_projection) + self.b_projection  # [batch_size,num_classes]
         return logits
+
+    def loss_multilabel(self,l2_lambda=0.0001): #0.0001#this loss function is for multi-label classification
+        with tf.name_scope("loss"):
+            #input: `logits` and `labels` must have the same shape `[batch_size, num_classes]`
+            #output: A 1-D `Tensor` of length `batch_size` of the same type as `logits` with the softmax cross entropy loss.
+            #input_y:shape=(?, 1999); logits:shape=(?, 1999)
+            # let `x = logits`, `z = labels`.  The logistic loss is:z * -log(sigmoid(x)) + (1 - z) * -log(1 - sigmoid(x))
+            losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.input_y_multilabel, logits=self.logits);#losses=tf.nn.softmax_cross_entropy_with_logits(labels=self.input__y,logits=self.logits)
+            #losses=-self.input_y_multilabel*tf.log(self.logits)-(1-self.input_y_multilabel)*tf.log(1-self.logits)
+            print("sigmoid_cross_entropy_with_logits.losses:",losses) #shape=(?, 1999).
+            losses=tf.reduce_sum(losses,axis=1) #shape=(?,). loss for all data in the batch
+            loss=tf.reduce_mean(losses)         #shape=().   average loss in the batch
+            l2_losses = tf.add_n([tf.nn.l2_loss(v) for v in tf.trainable_variables() if 'bias' not in v.name]) * l2_lambda
+            loss=loss+l2_losses
+        return loss
 
     def loss(self,l2_lambda=0.0001):
         with tf.name_scope("loss"):
