@@ -146,8 +146,7 @@ def do_eval(sess,fast_text,evalX,evalY,batch_size,vocabulary_index2word_label): 
         y_predicted.append(label_list_top5[0])
 
     # Print the classification report
-    print(metrics.classification_report(y_test, y_predicted,
-                                        target_names=dataset_test.target_names))
+    print(metrics.classification_report(y_test, y_predicted))
 
     # Print and plot the confusion matrix
     cm = metrics.confusion_matrix(y_test, y_predicted)
