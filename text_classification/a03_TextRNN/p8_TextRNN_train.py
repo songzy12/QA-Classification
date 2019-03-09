@@ -80,7 +80,7 @@ def main(_):
             print(epoch,FLAGS.validate_every,(epoch % FLAGS.validate_every==0))
             if epoch % FLAGS.validate_every==0:
                 eval_loss = do_eval(sess,textRNN,testX,testY,batch_size,index2label)
-                print("Epoch %d Validation Loss:%.3f\tValidation Accuracy: %.3f" % (epoch,eval_loss,eval_acc))
+                print("Epoch %d Validation Loss:%.3f" % (epoch,eval_loss))
                 #save model to checkpoint
                 save_path=FLAGS.ckpt_dir+"model.ckpt"
                 saver.save(sess,save_path,global_step=epoch)
