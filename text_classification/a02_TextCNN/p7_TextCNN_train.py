@@ -9,6 +9,7 @@
 #sys.setdefaultencoding('utf8')
 import tensorflow as tf
 import numpy as np
+from sklearn import metrics
 from p7_TextCNN_model import TextCNN
 #from data_util import create_vocabulary,load_data_multilabel
 import pickle
@@ -135,6 +136,10 @@ def do_eval(sess,textCNN,evalX,evalY,num_classes):
     eval_loss,eval_counter,eval_f1_score,eval_p,eval_r=0.0,0,0.0,0.0,0.0
     batch_size=1
     label_dict_confuse_matrix=init_label_dict(num_classes)
+    
+    y_test = []
+    y_predicted = []
+
     for start,end in zip(range(0,number_examples,batch_size),range(batch_size,number_examples,batch_size)):
         feed_dict = {textCNN.input_x: evalX[start:end], textCNN.input_y_multilabel:evalY[start:end],textCNN.dropout_keep_prob: 1.0,
                      textCNN.is_training_flag: False}
@@ -144,6 +149,16 @@ def do_eval(sess,textCNN,evalX,evalY,num_classes):
         #f1_score,p,r=compute_f1_score(list(label_list_top5), evalY[start:end][0])
         label_dict_confuse_matrix=compute_confuse_matrix(target_y, predict_y, label_dict_confuse_matrix)
         eval_loss,eval_counter=eval_loss+curr_eval_loss,eval_counter+1
+        
+        y_test.append(target_y[0])
+        y_predicted.append(predict_y[0])
+
+    # Print the classification report
+    print(metrics.classification_report(y_test, y_predicted))
+
+    # Print and plot the confusion matrix
+    cm = metrics.confusion_matrix(y_test, y_predicted)
+    print(cm)
 
     f1_micro,f1_macro=compute_micro_macro(label_dict_confuse_matrix) #label_dict_accusation is a dict, key is: accusation,value is: (TP,FP,FN). where TP is number of True Positive
     f1_score=(f1_micro+f1_macro)/2.0
@@ -298,7 +313,7 @@ def get_target_label_short(eval_y):
     return eval_y_short
 
 #get top5 predicted labels
-def get_label_using_logits(logits,top_number=5):
+def get_label_using_logits(logits,top_number=1):
     # index_list=np.argsort(logits)[-top_number:]
     #vindex_list=index_list[::-1]
     y_predict_labels = [i for i in range(len(logits)) if logits[i] >= 0.50]  # TODO 0.5PW e.g.[2,12,13,10]
