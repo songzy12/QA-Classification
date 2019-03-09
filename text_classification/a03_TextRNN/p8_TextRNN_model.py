@@ -22,7 +22,8 @@ class TextRNN:
 
         # add placeholder (X,label)
         self.input_x = tf.placeholder(tf.int32, [None, self.sequence_length], name="input_x")  # X
-        self.input_y = tf.placeholder(tf.int32,[None], name="input_y")  # y [None,num_classes]
+        #self.input_y = tf.placeholder(tf.int32,[None], name="input_y")  # y [None,num_classes]
+        self.input_y_multilabel = tf.placeholder(tf.float32,[None,self.num_classes], name="input_y_multilabel")  # y:[None,num_classes]. this is for multi-label classification only.
         self.dropout_keep_prob=tf.placeholder(tf.float32,name="dropout_keep_prob")
 
         self.global_step = tf.Variable(0, trainable=False, name="Global_Step")
@@ -129,4 +130,3 @@ def test():
             input_y=input_y=np.array([1,0,1,1,1,2,1,1]) #np.zeros((batch_size),dtype=np.int32) #[None, self.sequence_length]
             loss,acc,predict,_=sess.run([textRNN.loss_val,textRNN.accuracy,textRNN.predictions,textRNN.train_op],feed_dict={textRNN.input_x:input_x,textRNN.input_y:input_y,textRNN.dropout_keep_prob:dropout_keep_prob})
             print("loss:",loss,"acc:",acc,"label:",input_y,"prediction:",predict)
-test()

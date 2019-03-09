@@ -2,17 +2,15 @@
 #training the model.
 #process--->1.load data(X:list of lint,y:int). 2.create session. 3.feed data. 4.training (5.validation) ,(6.prediction)
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 import tensorflow as tf
 import numpy as np
 from sklearn import metrics
 from p8_TextRNN_model import TextRNN
-from data_util_zhihu import load_data_multilabel_new,create_voabulary,create_voabulary_label
 from tflearn.data_utils import pad_sequences #to_categorical
 import os
 import word2vec
 import pickle
+import h5py
 
 #configuration
 FLAGS=tf.app.flags.FLAGS
@@ -70,7 +68,7 @@ def main(_):
             for start, end in zip(range(0, number_of_training_data, batch_size),range(batch_size, number_of_training_data, batch_size)):
                 if epoch==0 and counter==0:
                     print("trainX[start:end]:",trainX[start:end])#;print("trainY[start:end]:",trainY[start:end])
-                curr_loss,curr_acc,_=sess.run([textRNN.loss_val,textRNN.accuracy,textRNN.train_op],feed_dict={textRNN.input_x:trainX[start:end],textRNN.input_y:trainY[start:end]
+                curr_loss,curr_acc,_=sess.run([textRNN.loss_val,textRNN.accuracy,textRNN.train_op],feed_dict={textRNN.input_x:trainX[start:end],textRNN.input_y_multilabel:trainY[start:end]
                     ,textRNN.dropout_keep_prob:1}) #curr_acc--->TextCNN.accuracy -->,textRNN.dropout_keep_prob:1
                 loss,counter,acc=loss+curr_loss,counter+1,acc+curr_acc
                 if counter %500==0:
@@ -128,13 +126,13 @@ def do_eval(sess,textRNN,evalX,evalY,batch_size,vocabulary_index2word_label):
     number_examples=len(evalX)
     eval_loss,eval_acc,eval_counter=0.0,0.0,0
     batch_size=1
-    
+
     y_test = []
     y_predicted = []
 
     for start,end in zip(range(0,number_examples,batch_size),range(batch_size,number_examples,batch_size)):
         curr_eval_loss, logits,curr_eval_acc= sess.run([textRNN.loss_val,textRNN.logits,textRNN.accuracy],#curr_eval_acc--->textCNN.accuracy
-                                          feed_dict={textRNN.input_x: evalX[start:end],textRNN.input_y: evalY[start:end]
+                                          feed_dict={textRNN.input_x: evalX[start:end],textRNN.input_y_multilabel: evalY[start:end]
                                               ,textRNN.dropout_keep_prob:1})
         predict_y = get_label_using_logits(logits[0], vocabulary_index2word_label)
         target_y= get_target_label_short(evalY[start:end][0])
