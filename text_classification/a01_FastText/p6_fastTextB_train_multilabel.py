@@ -8,6 +8,7 @@ for the n-gram,you can use data_util to generate. see method process_one_sentenc
 """
 import tensorflow as tf
 import numpy as np
+from sklearn import metrics
 from p6_fastTextB_model_multilabel import fastTextB as fastText
 #from p4_zhihu_load_data import load_data_with_multilabels,create_voabulary,create_voabulary_label
 #from tflearn.data_utils import to_categorical, pad_sequences
@@ -128,6 +129,10 @@ def do_eval(sess,fast_text,evalX,evalY,batch_size,vocabulary_index2word_label): 
     print("number_examples for validation:",number_examples)
     eval_loss,eval_acc,eval_counter=0.0,0.0,0
     batch_size=1
+
+    y_test = []
+    y_predicted = []
+
     for start,end in zip(range(0,number_examples,batch_size),range(batch_size,number_examples,batch_size)):
         evalY_batch=process_labels(evalY[start:end])
         curr_eval_loss,logit = sess.run([fast_text.loss_val,fast_text.logits], #curr_eval_acc-->fast_text.accuracy
@@ -136,6 +141,17 @@ def do_eval(sess,fast_text,evalX,evalY,batch_size,vocabulary_index2word_label): 
         label_list_top5 = get_label_using_logits(logit[0], vocabulary_index2word_label)
         curr_eval_acc=calculate_accuracy(list(label_list_top5),evalY_batch[0] ,eval_counter) # evalY[start:end][0]
         eval_loss,eval_counter,eval_acc=eval_loss+curr_eval_loss,eval_counter+1,eval_acc+curr_eval_acc
+
+        y_test.append(evalY_batch[0][0])
+        y_predicted.append(label_list_top5[0])
+
+    # Print the classification report
+    print(metrics.classification_report(y_test, y_predicted,
+                                        target_names=dataset_test.target_names))
+
+    # Print and plot the confusion matrix
+    cm = metrics.confusion_matrix(y_test, y_predicted)
+    print(cm)
 
     return eval_loss/float(eval_counter),eval_acc/float(eval_counter)
 
@@ -173,7 +189,7 @@ def assign_pretrained_word_embedding(sess,vocabulary_index2word,vocab_size,fast_
     print("using pre-trained word emebedding.ended...")
 
 #从logits中取出前五 get label using logits
-def get_label_using_logits(logits,vocabulary_index2word_label,top_number=5):
+def get_label_using_logits(logits,vocabulary_index2word_label,top_number=1):
     index_list=np.argsort(logits)[-top_number:]
     index_list=index_list[::-1]
     #label_list=[]
@@ -225,7 +241,7 @@ def load_data(cache_file_h5py,cache_file_pickle):
     print("INFO. cache file load successful...")
     return word2index, label2index,train_X,train_Y,vaild_X,valid_Y,test_X,test_Y
 
-def process_labels(trainY_batch,require_size=5,number=None):
+def process_labels(trainY_batch,require_size=1,number=None):
     """
     process labels to get fixed size labels given a spense label
     :param trainY_batch:
@@ -250,7 +266,7 @@ def process_labels(trainY_batch,require_size=5,number=None):
         pass
     return trainY_batch_result
 
-def proces_label_to_algin(ys_list,require_size=5):
+def proces_label_to_algin(ys_list,require_size=1):
     """
     given a list of labels, process it to fixed size('require_size')
     :param ys_list: a list
