@@ -68,11 +68,11 @@ def main(_):
             for start, end in zip(range(0, number_of_training_data, batch_size),range(batch_size, number_of_training_data, batch_size)):
                 if epoch==0 and counter==0:
                     print("trainX[start:end]:",trainX[start:end])#;print("trainY[start:end]:",trainY[start:end])
-                curr_loss,curr_acc,_=sess.run([textRNN.loss_val,textRNN.accuracy,textRNN.train_op],feed_dict={textRNN.input_x:trainX[start:end],textRNN.input_y_multilabel:trainY[start:end]
+                curr_loss,_=sess.run([textRNN.loss_val,textRNN.train_op],feed_dict={textRNN.input_x:trainX[start:end],textRNN.input_y_multilabel:trainY[start:end]
                     ,textRNN.dropout_keep_prob:1}) #curr_acc--->TextCNN.accuracy -->,textRNN.dropout_keep_prob:1
-                loss,counter,acc=loss+curr_loss,counter+1,acc+curr_acc
+                loss,counter=loss+curr_loss,counter+1
                 if counter %500==0:
-                    print("Epoch %d\tBatch %d\tTrain Loss:%.3f\tTrain Accuracy:%.3f" %(epoch,counter,loss/float(counter),acc/float(counter))) #tTrain Accuracy:%.3f---》acc/float(counter)
+                    print("Epoch %d\tBatch %d\tTrain Loss:%.3f" %(epoch,counter,loss/float(counter))) #tTrain Accuracy:%.3f---》acc/float(counter)
             #epoch increment
             print("going to increment epoch counter....")
             sess.run(textRNN.epoch_increment)

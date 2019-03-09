@@ -34,12 +34,10 @@ class TextRNN:
         self.instantiate_weights()
         self.logits = self.inference() #[None, self.label_size]. main computation graph is here.
         if not is_training:
-            return        
+            return
         self.loss_val = self.loss_multilabel()
         self.train_op = self.train()
-        self.predictions = tf.argmax(self.logits, axis=1, name="predictions")  # shape:[None,]
-        correct_prediction = tf.equal(tf.cast(self.predictions,tf.int32), self.input_y) #tf.argmax(self.logits, 1)-->[batch_size]
-        self.accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="Accuracy") # shape=()
+
     def instantiate_weights(self):
         """define all weights here"""
         with tf.name_scope("embedding"): # embedding matrix
