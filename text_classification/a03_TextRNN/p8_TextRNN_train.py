@@ -79,14 +79,14 @@ def main(_):
             # 4.validation
             print(epoch,FLAGS.validate_every,(epoch % FLAGS.validate_every==0))
             if epoch % FLAGS.validate_every==0:
-                eval_loss, eval_acc=do_eval(sess,textRNN,testX,testY,batch_size,index2label)
+                eval_loss = do_eval(sess,textRNN,testX,testY,batch_size,index2label)
                 print("Epoch %d Validation Loss:%.3f\tValidation Accuracy: %.3f" % (epoch,eval_loss,eval_acc))
                 #save model to checkpoint
                 save_path=FLAGS.ckpt_dir+"model.ckpt"
                 saver.save(sess,save_path,global_step=epoch)
 
         # 5.最后在测试集上做测试，并报告测试准确率 Test
-        test_loss, test_acc = do_eval(sess, textRNN, testX, testY, batch_size,index2label)
+        test_loss = do_eval(sess, textRNN, testX, testY, batch_size,index2label)
     pass
 
 def assign_pretrained_word_embedding(sess,vocabulary_index2word,vocab_size,textRNN,word2vec_model_path=None):
@@ -131,13 +131,13 @@ def do_eval(sess,textRNN,evalX,evalY,batch_size,vocabulary_index2word_label):
     y_predicted = []
 
     for start,end in zip(range(0,number_examples,batch_size),range(batch_size,number_examples,batch_size)):
-        curr_eval_loss, logits,curr_eval_acc= sess.run([textRNN.loss_val,textRNN.logits,textRNN.accuracy],#curr_eval_acc--->textCNN.accuracy
+        curr_eval_loss, logits= sess.run([textRNN.loss_val,textRNN.logits],#curr_eval_acc--->textCNN.accuracy
                                           feed_dict={textRNN.input_x: evalX[start:end],textRNN.input_y_multilabel: evalY[start:end]
                                               ,textRNN.dropout_keep_prob:1})
         predict_y = get_label_using_logits(logits[0], vocabulary_index2word_label)
         target_y= get_target_label_short(evalY[start:end][0])
         #curr_eval_acc=calculate_accuracy(list(label_list_top5), evalY[start:end][0],eval_counter)
-        eval_loss,eval_acc,eval_counter=eval_loss+curr_eval_loss,eval_acc+curr_eval_acc,eval_counter+1
+        eval_loss,eval_counter=eval_loss+curr_eval_loss,eval_counter+1
 
         y_test.append(target_y[0])
         y_predicted.append(predict_y[0])
@@ -149,7 +149,7 @@ def do_eval(sess,textRNN,evalX,evalY,batch_size,vocabulary_index2word_label):
     cm = metrics.confusion_matrix(y_test, y_predicted)
     print(cm)
 
-    return eval_loss/float(eval_counter),eval_acc/float(eval_counter)
+    return eval_loss/float(eval_counter)
 
 
 def get_target_label_short(eval_y):
