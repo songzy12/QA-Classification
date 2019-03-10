@@ -33,6 +33,8 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost.sklearn import XGBClassifier
 from xgboost import plot_importance
 
+from lightgbm import LGBMClassifier
+
 import jieba
 import jieba.posseg as pseg
 import gensim
@@ -73,6 +75,7 @@ def train(data_train='../data/svm/train', data_test='../data/svm/test'):
               RandomForestClassifier(),
               MultinomialNB(),
               XGBClassifier(objective='multi:softprob'),
+              LGBMClassifier()
               ]
 
     for model in models:

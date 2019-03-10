@@ -1,1 +1,1 @@
-python baseline.py 2>&1 | tee $(date +%F).log
+python baseline.py 2>&1 | tee ../log/baseline_$(date +%F).log

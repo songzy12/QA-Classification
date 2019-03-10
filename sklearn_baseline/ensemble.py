@@ -22,7 +22,7 @@ from sklearn.feature_extraction import DictVectorizer
 
 from matplotlib import pyplot
 
-import lightgbm as lgb
+from lightgbm import LGBMClassifier
 
 import jieba
 import jieba.posseg as pseg
@@ -56,7 +56,7 @@ def train():
 
     # split the dataset in training and test set:
 
-    model = lgb.LGBMClassifier()
+    model = LGBMClassifier()
 
     print(model)
     text_clf = Pipeline([('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1, 3))),
