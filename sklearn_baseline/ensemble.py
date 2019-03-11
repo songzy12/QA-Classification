@@ -23,6 +23,8 @@ from sklearn.feature_extraction import DictVectorizer
 
 from matplotlib import pyplot
 
+
+from sklearn.linear_model import SGDClassifier
 from lightgbm import LGBMClassifier
 
 import io
@@ -33,6 +35,56 @@ import jieba.posseg as pseg
 import gensim
 
 from constant import id2category
+
+
+class ClassifierWrapper(BaseEstimator, TransformerMixin):
+
+    def __init__(self, estimator, verbose=None, fit_params=None, use_proba=True, scoring=None):
+        self.estimator = estimator
+        self.verbose = verbose  # True = 1, False = 0, 1 - moderately verbose, 2- extra verbose
+        if verbose is None:
+            self.verbose = 0
+        else:
+            self.verbose = verbose
+        self.fit_params = fit_params
+        self.use_proba = use_proba  # whether to use predict_proba in transform
+        self.scoring = scoring  # calculate validation score, takes score function name
+        # TODO check if scorer imported?
+        self.score = None  # variable to keep the score if scoring is set.
+
+    def fit(self, X, y):
+        fp = self.fit_params
+        if self.verbose == 2:
+            print("X: ", X.shape, "\nFit params:", self.fit_params)
+
+        if fp is not None:
+            self.estimator.fit(X, y, **fp)
+        else:
+            self.estimator.fit(X, y)
+
+        return self
+
+    def transform(self, X):
+        if self.use_proba:
+            return self.estimator.predict_proba(X)  # [:, 1].reshape(-1,1)
+        else:
+            return self.estimator.predict(X)
+
+    def fit_transform(self, X, y, **kwargs):
+        self.fit(X, y)
+        p = self.transform(X)
+        if self.scoring is not None:
+            self.score = eval(self.scoring+"(y,p)")
+            # TODO print own instance name?
+            if self.verbose > 0:
+                print("score: ", self.score)
+        return p
+
+    def predict(self, X):
+        return self.estimator.predict(X)
+
+    def predict_proba(self, X):
+        return self.estimator.predict_proba(X)
 
 
 def tokenize(text):
@@ -63,10 +115,10 @@ class TextStats(BaseEstimator, TransformerMixin):
 
         return [{
             'length': len(text),
-        #    'concept_cnt': sum([1 for t in concepts if t in text]),
-        #    'ratio_word': len(jieba.lcut(text)) * 1. / len(text) if len(text) else 0,
-        #    'ratio_repeat': len(set(text)) * 1. / len(text) if len(text) else 0,
-        #    'ratio_alpha': sum([1 for t in text if t.isalpha()]) / len(text) if len(text) else 0
+            #    'concept_cnt': sum([1 for t in concepts if t in text]),
+            #    'ratio_word': len(jieba.lcut(text)) * 1. / len(text) if len(text) else 0,
+            #    'ratio_repeat': len(set(text)) * 1. / len(text) if len(text) else 0,
+            #    'ratio_alpha': sum([1 for t in text if t.isalpha()]) / len(text) if len(text) else 0
         } for text in x]
 
 
@@ -90,10 +142,17 @@ def train():
         'features', FeatureUnion([
             ('tfidf', Pipeline([
                 ('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1, 3))),
-                ('tfidf', TfidfTransformer())])),
+                ('tfidf', TfidfTransformer())
+            ])),
             ('stats', Pipeline([
                 ('stats', TextStats()),
-                ('vect', DictVectorizer())])),
+                ('vect', DictVectorizer())
+            ])),
+            # ('sgd', Pipeline([
+            #     ('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1, 3))),
+            #     ('tfidf', TfidfTransformer()),
+            #     ('sgd', ClassifierWrapper(SGDClassifier(loss='log')))
+            # ])),
         ])),
         ('clf', model)
     ])
