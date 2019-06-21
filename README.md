@@ -6,10 +6,11 @@
 
 - `data/`: 除标注之外的所有数据文件（因为觉得标注比较重要
   - `label/`: 手工标注的数据
-  - `svm/`: 从标注文件生成的符合 sklearn 输入格式的数据
 - `model/`: 保存的训练好的模型文件
 - `sklearn_baseline`: 一些非神经网络的模型实现，如 svm, xgboost, lightgbm 等
 - `text_classification`: fork 的某个 repo, 但是原 repo 无法直接运行，进行了一些修改。
+- `util_data_sklearn.py`: 由 label 文件生成 sklearn 使用的输入格式
+- `util_data_tf.py`: 由 label 文件生成 tensorflow 使用的输入格式
 
 ## sklearn_baseline
 
