@@ -5,16 +5,13 @@
 Build a simple Question Classifier using TF-IDF or Bag of Words Model
 """
 
-import sys
-import json
 import io
+import json
+import joblib
 import os
 
-import numpy
-
-from sklearn.datasets import load_files
 from sklearn import metrics
-from sklearn.externals import joblib
+from sklearn.datasets import load_files
 from sklearn.pipeline import Pipeline, FeatureUnion
 
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
@@ -47,16 +44,16 @@ def _tokenize(text):
     # return jieba.lcut(text)
 
 
-def save_model(grid, filename='../model/svm.pkl'):
+def save_model(grid, filename='model/svm.pkl'):
     joblib.dump(grid, filename, compress=1)
 
 
-def load_model(filename='../model/svm.pkl'):
+def load_model(filename='model/svm.pkl'):
     grid = joblib.load(filename)
     return grid
 
 
-def train(data_train='../data/svm/train', data_test='../data/svm/test'):
+def train(data_train='data/svm/train', data_test='data/svm/test'):
     # the training data folder must be passed as first argument
     dataset_train = load_files(data_train, shuffle=False)
     dataset_test = load_files(data_test, shuffle=False)
@@ -94,7 +91,7 @@ def train(data_train='../data/svm/train', data_test='../data/svm/test'):
             if y_predicted[i] != y_test[i]:
                 confusion[q.decode('utf8')] = {
                     'label': id2category[y_test[i]], 'prediction': id2category[y_predicted[i]]}
-        with io.open('confusion.json', 'w', encoding='utf8') as f:
+        with io.open('debug/confusion.json', 'w', encoding='utf8') as f:
             f.write(json.dumps(confusion, ensure_ascii=False, indent=4))
 
         # Print the classification report
