@@ -1,9 +1,7 @@
-*.swp
 log
-note
-tmp
-data
 model
-references
+
 __pycache__
+*.swp
+
 .vscode
